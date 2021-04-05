@@ -18,6 +18,14 @@
                     </v-col>
                 </v-list-item-content>
             </v-list-item>
+
+             <v-list-item>
+                <v-list-item-content>
+                    <v-col cols="12" class="text-right">       
+                        Total Price: {{ total }}
+                    </v-col>
+                </v-list-item-content>
+            </v-list-item>
         </v-card-text>
     </v-card>
 </template>
@@ -26,7 +34,7 @@
 import { mapGetters, mapActions } from 'vuex'
 export default {
     computed: {
-      ...mapGetters({ cart: 'getCart' })
+      ...mapGetters({ cart: 'getCart', total: 'getTotal' })
     },
     methods: {
         ...mapActions(['increaseByOne', 'decreaseByOne'])

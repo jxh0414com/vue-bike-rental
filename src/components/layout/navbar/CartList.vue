@@ -1,5 +1,5 @@
 <template>
-    <v-menu offset-y :close-on-content-click="false">
+    <v-menu offset-y :close-on-content-click="false" left>
         <template v-slot:activator="{ on, attrs }">
             <v-btn icon v-bind="attrs" v-on="on">
             <v-icon >mdi-cart</v-icon>

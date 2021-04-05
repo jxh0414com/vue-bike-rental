@@ -10,6 +10,11 @@ export default new Vuex.Store({
     getters: {
         getCart(state) {
             return state.cart;
+        },
+        getTotal(state) {
+            let result = 0;
+            state.cart.map(e => result += (e.price * e.count))
+            return parseFloat(result).toFixed(2)
         }
     },
     mutations: {
@@ -24,6 +29,9 @@ export default new Vuex.Store({
         },
         decrease(state, id) {
             state.cart.map(e => e.id === id ? {...e, count: e.count-- } : e)
+        },
+        emptyCart(state) {
+            state.cart = []
         }
     },
     actions: {

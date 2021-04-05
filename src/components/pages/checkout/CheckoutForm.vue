@@ -1,13 +1,12 @@
 <template>
-    <v-form ref="form" v-model="valid" lazy-validation>
+    <v-form ref="form" v-model="valid" lazy-validation @submit.prevent="submit">
         <v-container>
             <v-subheader>Customer Information</v-subheader>
             <v-row>
                 <v-col cols="12" md="6">
                 <v-text-field
                     v-model="order.first_name"
-                    :rules="nameRules"
-                    :counter="10"
+                    :rules="rules.requiredRules"
                     label="First name"
                     required
                 ></v-text-field>
@@ -16,26 +15,24 @@
                 <v-col cols="12" md="6">
                 <v-text-field
                     v-model="order.last_name"
-                    :rules="nameRules"
-                    :counter="10"
+                    :rules="rules.requiredRules"
                     label="Last name"
                     required
                 ></v-text-field>
                 </v-col>
             </v-row>
 
-            <v-text-field v-model="order.email" :rules="emailRules" label="E-mail" required></v-text-field>
+            <v-text-field v-model="order.email" :rules="rules.emailRules" label="E-mail" required></v-text-field>
 
-            <v-text-field v-model="order.phone" :rules="emailRules" label="Phone" required></v-text-field>
+            <v-text-field v-model="order.phone" :rules="rules.requiredRules" label="Phone" required></v-text-field>
             
-            <v-text-field v-model="order.address" :rules="emailRules" label="Address" required></v-text-field>
+            <v-text-field v-model="order.address" :rules="rules.requiredRules" label="Address" required></v-text-field>
 
             <v-row>
                 <v-col cols="12" md="4">
                     <v-text-field
                         v-model="order.state"
-                        :rules="nameRules"
-                        :counter="10"
+                        :rules="rules.requiredRules"
                         label="State"
                         required
                     ></v-text-field>
@@ -44,8 +41,7 @@
                 <v-col cols="12" md="4">
                     <v-text-field
                         v-model="order.city"
-                        :rules="nameRules"
-                        :counter="10"
+                        :rules="rules.requiredRules"
                         label="City"
                         required
                     ></v-text-field>
@@ -54,24 +50,24 @@
                 <v-col cols="12" md="4">
                     <v-text-field
                         v-model="order.zip"
-                        :rules="nameRules"
-                        :counter="10"
+                        :rules="rules.zipRules"
                         label="ZIP Code"
                         required
+                        type="number"
                     ></v-text-field>
                 </v-col>
             </v-row>
 
             <v-subheader>Billing Address</v-subheader>
 
-            <v-text-field v-model="order.credit_card" :rules="emailRules" label="Credit Card" required></v-text-field>
+            <v-text-field v-model="order.credit_card" :rules="rules.creditCardRules" label="Credit Card" type="number" required></v-text-field>
 
             <v-row>
                 <v-col cols="4" md="4">
                 <v-text-field
                     v-model="order.expire_mm"
-                    :rules="nameRules"
-                    :counter="10"
+                    :rules="rules.expiresRules"
+                    type="number"
                     label="MM"
                     required
                 ></v-text-field>
@@ -79,9 +75,9 @@
 
                 <v-col cols="4" md="4">
                 <v-text-field
-                    v-model="order.expire.yy"
-                    :rules="nameRules"
-                    :counter="10"
+                    v-model="order.expire_yy"
+                    :rules="rules.expiresRules"
+                    type="number"
                     label="YY"
                     required
                 ></v-text-field>
@@ -90,9 +86,9 @@
                 <v-col cols="4" md="4">
                 <v-text-field
                     v-model="order.card_cvc"
-                    :rules="nameRules"
-                    :counter="10"
-                    label="MM"
+                    :rules="rules.cvcRules"
+                    type="number"
+                    label="CVC"
                     required
                 ></v-text-field>
                 </v-col>
@@ -104,14 +100,13 @@
             </v-radio-group>
 
             <template v-if="!order.same_address">
-                <v-text-field v-model="order.billing_address" :rules="emailRules" label="Address" required></v-text-field>
+                <v-text-field v-model="order.billing_address" :rules="rules.requiredRules" label="Address" required></v-text-field>
                 
                 <v-row>
                     <v-col cols="12" md="4">
                         <v-text-field
                             v-model="order.billing_state"
-                            :rules="nameRules"
-                            :counter="10"
+                            :rules="rules.requiredRules"
                             label="State"
                             required
                         ></v-text-field>
@@ -120,8 +115,7 @@
                     <v-col cols="12" md="4">
                         <v-text-field
                             v-model="order.billing_city"
-                            :rules="nameRules"
-                            :counter="10"
+                            :rules="rules.requiredRules"
                             label="City"
                             required
                         ></v-text-field>
@@ -130,9 +124,9 @@
                     <v-col cols="12" md="4">
                         <v-text-field
                             v-model="order.billing_zip"
-                            :rules="nameRules"
-                            :counter="10"
+                            :rules="rules.zipRules"
                             label="ZIP Code"
+                            type="number"
                             required
                         ></v-text-field>
                     </v-col>
@@ -141,8 +135,8 @@
 
             <v-row>
                 <v-col cols="12" class="text-right">
-                    <v-btn color="success lighten-1" @click="resetValidation">
-                    Reset Validation
+                    <v-btn color="success lighten-1" type="submit">
+                        Submit
                     </v-btn>
                 </v-col>
             </v-row>
@@ -173,22 +167,25 @@
             billing_city: "",
             billing_zip: ""
       },
-      name: '',
-      nameRules: [
-        v => !!v || 'Name is required',
-        v => (v && v.length <= 10) || 'Name must be less than 10 characters',
-      ],
-      email: '',
-      emailRules: [
-        v => !!v || 'E-mail is required',
-        v => /.+@.+\..+/.test(v) || 'E-mail must be valid',
-      ],
+      rules: {
+        requiredRules: [v => !!v || "This field is required"],
+        emailRules: [
+            v => !!v || 'E-mail is required',
+            v => /.+@.+\..+/.test(v) || 'E-mail must be valid'],
+        zipRules: [v =>  !!v || 'This field is required', v => (v && v.length === 5) || 'ZIP must be a number with length of 5'],
+        creditCardRules: [v => !!v || 'This field is required', v => (v && v.length === 16) || 'Credit card/Debit card must be length of 16'],
+        expiresRules: [v => !!v || 'This field is required', v => (v && v.length === 2) || 'Please enter the valid expires date with only two digit'],
+        cvcRules: [v => !!v || 'This field is required', v => (v && v.length === 3) || 'Please enter the valid expires date with only two digit'],
+        },
     }),
-
     methods: {
-      resetValidation () {
-        this.$refs.form.resetValidation()
-      },
+        submit() {
+            if (this.$refs.form.validate()) {
+                window.alert('Thank you for renting our bike. Hope you have a great time!')
+                this.$router.push({ name: 'home' })
+                this.$store.commit('emptyCart')
+            }
+        }
     },
   }
 </script>
